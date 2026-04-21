@@ -536,6 +536,7 @@ h1.glow-text {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
     position: relative;
     z-index: 1;
 }
@@ -557,14 +558,15 @@ h1.glow-text {
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     cursor: pointer;
     user-select: none;
     width: 100%;
+    gap: 0.5rem;
     -webkit-tap-highlight-color: transparent;
 }
 
-.card-header-left { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; }
+.card-header-left { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; overflow: hidden; }
 
 .avatar {
     width: 48px;
@@ -583,7 +585,7 @@ h1.glow-text {
 
 .card:hover .avatar { transform: scale(1.05); }
 
-.card-info { flex: 1; min-width: 0; }
+.card-info { flex: 1; min-width: 0; overflow: hidden; }
 
 .student-name {
     font-family: 'Outfit', sans-serif;
@@ -622,7 +624,7 @@ h1.glow-text {
 .team-lannister { background: var(--team-lannister-bg); color: var(--team-lannister-text); box-shadow: var(--team-lannister-glow); }
 .team-baratheon { background: var(--team-baratheon-bg); color: var(--team-baratheon-text); box-shadow: var(--team-baratheon-glow); }
 
-.card-header-right { display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; }
+.card-header-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-left: auto; }
 
 .score-badge {
     display: flex;
@@ -634,6 +636,8 @@ h1.glow-text {
     box-shadow: 0 0 10px var(--accent-glow);
     border-radius: 12px;
     padding: 0.3rem 0.6rem;
+    flex-shrink: 0;
+    min-width: 44px;
 }
 
 .card:hover .score-badge { transform: scale(1.08); border-color: var(--accent-text); }
