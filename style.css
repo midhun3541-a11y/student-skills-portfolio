@@ -705,46 +705,144 @@ h1.glow-text {
 .no-results { grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-secondary); font-size: 1.1rem; transition: color 0.3s ease; }
 .highlight { background-color: var(--highlight-bg); color: #000; border-radius: 4px; padding: 0 2px; }
 
-/* ===== Mobile Optimization ===== */
+/* ===== Responsive Breakpoints ===== */
+
+/* Tablet — side-by-side but tighter */
 @media (max-width: 900px) {
-    .header-top { flex-direction: column; align-items: stretch; gap: 0.8rem; }
-    .header-controls { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
-    .search-wrapper { flex: 1; min-width: 150px; width: auto; }
-    .sort-wrapper { flex: 1; min-width: 150px; }
-    #searchInput, #sortSelect { width: 100%; }
-    .heading-block { text-align: left; }
-    .heading-divider { max-width: 100%; }
+    .header-top {
+        gap: 1.2rem;
+    }
+    .search-wrapper { width: 200px; }
 }
 
-@media (max-width: 640px) {
-    body { padding-top: 210px; }
-    .sticky-header { padding: 0.7rem 0.8rem; gap: 0.6rem; }
+/* Mobile — full vertical stack */
+@media (max-width: 768px) {
+    body {
+        /* Will be set precisely based on header height below */
+        padding-top: 230px;
+    }
+
+    .sticky-header {
+        padding: 0.75rem 1rem;
+        gap: 0.6rem;
+    }
+
+    /* Stack heading + controls vertically */
+    .header-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+    }
+
+    /* Heading stays left-aligned, full width */
+    .heading-block {
+        text-align: left;
+    }
     .heading-eyebrow { font-size: 0.65rem; letter-spacing: 0.18em; }
-    .heading-main { font-size: 1.15rem; }
-    .header-controls { gap: 0.5rem; }
-    .search-wrapper { width: 100%; }
-    #searchInput, #sortSelect { padding: 0.65rem 1rem; font-size: 0.9rem; }
+    .heading-main    { font-size: 1.1rem; }
+    .heading-divider { max-width: 100%; }
+
+    /* Controls stack: search on top, sort below, toggle on its own row */
+    .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    /* Search full width */
+    .search-wrapper {
+        width: 100%;
+    }
+
+    /* Sort full width */
+    .sort-wrapper {
+        width: 100%;
+    }
+
+    #searchInput,
+    #sortSelect {
+        width: 100%;
+        min-height: 44px;           /* Touch-friendly tap target */
+        padding: 0 1rem;
+        font-size: 0.9rem;
+        border-radius: 12px;        /* Slightly less round on mobile */
+    }
+
+    /* Dark mode toggle — its own right-aligned row */
+    .theme-toggle {
+        align-self: flex-end;       /* Push to right */
+        width: 40px;
+        height: 40px;
+        margin-top: 0.1rem;
+    }
+
+    /* Filter section */
     .filters-section { gap: 0.4rem; }
-    .filters-container { gap: 0.5rem; }
-    .filter-pill { padding: 0.4rem 0.75rem; font-size: 0.78rem; min-height: 36px; }
+
+    .filters-container {
+        gap: 0.5rem;
+        overflow: hidden;           /* Prevent container overflow */
+    }
+
+    /* Horizontal scrolling filter pills — single row, no wrap */
+    .filter-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        padding-bottom: 4px;        /* Space for scrollbar on some browsers */
+    }
+
+    .filter-pills::-webkit-scrollbar { display: none; }
+    .filter-pills { scrollbar-width: none; }
+
+    .filter-pill {
+        flex-shrink: 0;             /* Prevent pills from collapsing */
+        min-height: 36px;
+        padding: 0 0.85rem;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    /* Active sort indicator */
+    .active-sort-indicator { font-size: 0.72rem; }
+
+    /* Content grid */
     .container { padding: 0.75rem; }
     .grid { grid-template-columns: 1fr; gap: 0.8rem; }
+
+    /* Cards */
     .card { padding: 1rem; border-radius: 16px; }
+    .card:hover { transform: none; box-shadow: var(--card-shadow); }
+    .card:active { transform: scale(0.98); }
+
+    /* Card internals */
     .avatar { width: 42px; height: 42px; font-size: 1rem; }
     .student-name { font-size: 1.05rem; }
     .score-value { font-size: 1rem; }
     .expand-icon { width: 28px; height: 28px; }
-    .theme-toggle { width: 34px; height: 34px; }
-    .card:hover { transform: none; box-shadow: var(--card-shadow); }
-    .card:active { transform: scale(0.98); }
-    .active-sort-indicator { font-size: 0.72rem; }
 }
 
-@media (max-width: 400px) {
-    body { padding-top: 220px; }
+/* Small phones */
+@media (max-width: 480px) {
+    body { padding-top: 250px; }
+
+    .sticky-header { padding: 0.65rem 0.85rem; }
+
     .heading-eyebrow { font-size: 0.6rem; letter-spacing: 0.14em; }
-    .heading-main { font-size: 1rem; }
-    .card { padding: 0.85rem; }
-    .avatar { width: 38px; height: 38px; font-size: 0.9rem; }
-    .score-badge { padding: 0.2rem 0.5rem; }
+    .heading-main    { font-size: 1rem; }
+
+    #searchInput,
+    #sortSelect { font-size: 0.85rem; }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+    body { padding-top: 260px; }
+    .heading-main { font-size: 0.92rem; }
+    .card { padding: 0.8rem; }
+    .avatar { width: 36px; height: 36px; font-size: 0.85rem; }
+    .score-badge { padding: 0.15rem 0.4rem; }
+    .score-value { font-size: 0.9rem; }
 }
