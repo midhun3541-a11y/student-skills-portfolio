@@ -529,9 +529,7 @@ h1.glow-text {
     display: flex;
     flex-direction: column;
     box-shadow: var(--card-shadow);
-    will-change: transform, opacity;
     opacity: 0;
-    transform: translateY(20px);
     animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     width: 100%;
     max-width: 100%;
@@ -539,15 +537,12 @@ h1.glow-text {
     overflow: hidden;
     position: relative;
     z-index: 1;
-}
-
-/* Hover transform separate from global theme transition */
-.card {
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    /* Desktop hover transition — overridden on mobile */
+    transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes fadeSlideUp {
-    to { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; }
 }
 
 .card:hover {
@@ -846,10 +841,22 @@ h1.glow-text {
     .container { padding: 0.75rem; }
     .grid { grid-template-columns: 1fr; gap: 0.8rem; }
 
-    /* Cards */
-    .card { padding: 1rem; border-radius: 16px; }
-    .card:hover { transform: none; box-shadow: var(--card-shadow); }
-    .card:active { transform: scale(0.98); }
+    /* Cards — ALL transforms disabled on mobile to prevent scroll-triggered shifts */
+    .card {
+        padding: 1rem;
+        border-radius: 16px;
+        transform: none !important;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        will-change: auto;
+    }
+    .card:hover,
+    .card:active,
+    .card:focus {
+        transform: none !important;
+        box-shadow: var(--card-shadow);
+    }
+    .card:hover .avatar { transform: none; }
+    .card:hover .score-badge { transform: none; }
 
     /* Card internals */
     .avatar { width: 42px; height: 42px; font-size: 1rem; }
