@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Skills Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="sticky-header">
+        <div class="header-top">
+            <!-- LEFT: Heading -->
+            <div class="heading-block">
+                <p class="heading-eyebrow">CRESCENDO'26 &bull; TROIZEANTZ</p>
+                <h1 class="heading-main">SKILL SHEET <span class="heading-dash">—</span> BATCH 2025</h1>
+                <div class="heading-divider"></div>
+            </div>
+
+            <!-- RIGHT: Controls -->
+            <div class="header-controls">
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="Search by name, skill, or team...">
+                </div>
+                <div class="sort-wrapper">
+                    <select id="sortSelect">
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="roll-asc" selected>Roll Number (Ascending)</option>
+                        <option value="roll-desc">Roll Number (Descending)</option>
+                        <option value="score-desc">Total Score (High → Low)</option>
+                        <option value="score-asc">Total Score (Low → High)</option>
+                    </select>
+                </div>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Dark Mode" title="Toggle Dark Mode">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-container">
+                <button id="clearFiltersBtn" class="filter-pill clear-btn" style="display: none;">
+                    Reset Filters
+                </button>
+                <div id="filterPills" class="filter-pills">
+                    <!-- Filter pills generated dynamically by JS -->
+                </div>
+            </div>
+            <div class="active-sort-indicator">
+                <span class="sort-label">Sorted by:</span>
+                <span id="activeSortText" class="sort-value">Roll Number (Ascending)</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="studentGrid" class="grid">
+            <!-- Student cards generated dynamically by JS -->
+        </div>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="teamMapping.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
