@@ -100,6 +100,9 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Single global rule for ultra-smooth theme switching — colors only, no layout */
@@ -121,6 +124,9 @@ body {
     padding-top: 170px;
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* ===== Header Layout ===== */
@@ -476,13 +482,22 @@ h1.glow-text {
 .dropdown-divider { height: 1px; background: var(--card-border); margin: 0.3rem 0; }
 
 /* Main Container & Grid */
-.container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+.container { 
+    max-width: 1400px; 
+    width: 100%; 
+    margin: 0 auto; 
+    padding: 1.5rem; 
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
     gap: 1.2rem;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Skeleton */
@@ -514,6 +529,9 @@ h1.glow-text {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Hover transform separate from global theme transition */
@@ -720,11 +738,18 @@ h1.glow-text {
     body {
         /* Will be set precisely based on header height below */
         padding-top: 230px;
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .sticky-header {
         padding: 0.75rem 1rem;
         gap: 0.6rem;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+        left: 0;
+        right: 0;
     }
 
     /* Stack heading + controls vertically */
@@ -826,9 +851,9 @@ h1.glow-text {
 
 /* Small phones */
 @media (max-width: 480px) {
-    body { padding-top: 250px; }
+    body { padding-top: 250px; padding-left: 8px; padding-right: 8px; }
 
-    .sticky-header { padding: 0.65rem 0.85rem; }
+    .sticky-header { padding: 0.65rem 0.85rem; width: 100%; }
 
     .heading-eyebrow { font-size: 0.6rem; letter-spacing: 0.14em; }
     .heading-main    { font-size: 1rem; }
@@ -839,7 +864,7 @@ h1.glow-text {
 
 /* Very small phones */
 @media (max-width: 360px) {
-    body { padding-top: 260px; }
+    body { padding-top: 260px; padding-left: 6px; padding-right: 6px; }
     .heading-main { font-size: 0.92rem; }
     .card { padding: 0.8rem; }
     .avatar { width: 36px; height: 36px; font-size: 0.85rem; }
