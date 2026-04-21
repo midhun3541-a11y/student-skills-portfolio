@@ -20,17 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Dynamic Header Height Adjustment ---
+    // Ensures the first card is NEVER hidden under the fixed header
+    const stickyHeader = document.querySelector('.sticky-header');
+
     function adjustBodyPadding() {
-        const header = document.querySelector('.sticky-header');
-        if (header) {
-            // Add exactly 20px of safe space below the header dynamically
-            document.body.style.paddingTop = (header.offsetHeight + 20) + 'px';
-        }
+        if (!stickyHeader) return;
+        const headerH = stickyHeader.offsetHeight;
+        const safeOffset = headerH + 24; // 24px guaranteed buffer
+        document.body.style.paddingTop = safeOffset + 'px';
     }
-    // Update on resize and initial load
+
+    // Run multiple passes to catch font loading and layout shifts
+    adjustBodyPadding();                           // Immediate
+    setTimeout(adjustBodyPadding, 100);            // After short layout settle
+    setTimeout(adjustBodyPadding, 500);            // After web fonts load
     window.addEventListener('resize', adjustBodyPadding);
-    // Slight delay to ensure fonts/layout are calculated
-    setTimeout(adjustBodyPadding, 50);
+
+    // Watch for header size changes (e.g. filter pills appearing/disappearing)
+    if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(adjustBodyPadding).observe(stickyHeader);
+    }
 
     if (typeof studentData === 'undefined') {
         grid.innerHTML = '<p class="no-results">Error: Data could not be loaded.</p>';
