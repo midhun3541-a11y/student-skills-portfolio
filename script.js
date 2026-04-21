@@ -19,6 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', newTheme);
     });
 
+    // --- Dynamic Header Height Adjustment ---
+    function adjustBodyPadding() {
+        const header = document.querySelector('.sticky-header');
+        if (header) {
+            // Add exactly 20px of safe space below the header dynamically
+            document.body.style.paddingTop = (header.offsetHeight + 20) + 'px';
+        }
+    }
+    // Update on resize and initial load
+    window.addEventListener('resize', adjustBodyPadding);
+    // Slight delay to ensure fonts/layout are calculated
+    setTimeout(adjustBodyPadding, 50);
+
     if (typeof studentData === 'undefined') {
         grid.innerHTML = '<p class="no-results">Error: Data could not be loaded.</p>';
         return;
