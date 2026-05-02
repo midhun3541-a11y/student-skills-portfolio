@@ -15,17 +15,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const themeToggleBtn = document.getElementById('themeToggle');
     const activeSortText = document.getElementById('activeSortText');
+    const teamFilterBtn = document.getElementById('teamFilterBtn');
+    const teamDropdown = document.getElementById('teamDropdown');
+    const teamFilterLabel = document.getElementById('teamFilterLabel');
+    const teamDropdownItems = teamDropdown.querySelectorAll('.team-dropdown-item');
+    const bgOverlay = document.getElementById('bgOverlay');
 
     // --- Dark Mode Logic ---
     // Pure CSS toggle, zero DOM re-rendering for maximum smoothness
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    const currentTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', currentTheme);
 
     themeToggleBtn.addEventListener('click', () => {
-        let theme = document.documentElement.getAttribute('data-theme');
-        let newTheme = theme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+        const theme = document.documentElement.getAttribute('data-theme');
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (state && state.selectedTeam !== 'all') {
+                dissolveBackground(state.selectedTeam.toLowerCase());
+            }
+        });
     });
 
     // --- Dynamic Header Height Adjustment ---
@@ -39,11 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.paddingTop = safeOffset + 'px';
     }
 
-    // Run multiple passes to catch font loading and layout shifts
-    adjustBodyPadding();                           // Immediate
-    setTimeout(adjustBodyPadding, 100);            // After short layout settle
-    setTimeout(adjustBodyPadding, 500);            // After web fonts load
-    window.addEventListener('resize', adjustBodyPadding);
+    adjustBodyPadding();
+    setTimeout(adjustBodyPadding, 150);
+    window.addEventListener('resize', adjustBodyPadding, { passive: true });
 
     // Watch for header size changes (e.g. filter pills appearing/disappearing)
     if (typeof ResizeObserver !== 'undefined') {
@@ -153,8 +161,88 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         searchTerm: '',
         selectedFilters: new Set(),
-        sortBy: 'roll-asc'
+        sortBy: 'roll-asc',
+        selectedTeam: 'all'
     };
+
+    // --- Dissolve Background Transition ---
+    let dissolveTimer = null;
+    function dissolveBackground(teamKey) {
+        const themePrefix = document.documentElement.getAttribute('data-theme') || 'dark';
+
+        if (!teamKey || teamKey === 'all') {
+            bgOverlay.classList.remove('visible');
+            return;
+        }
+
+        const newClass = `bg-${themePrefix}-${teamKey}`;
+
+        if (bgOverlay.classList.contains('visible')) {
+            bgOverlay.classList.remove('visible');
+            clearTimeout(dissolveTimer);
+            dissolveTimer = setTimeout(() => {
+                bgOverlay.className = 'bg-overlay ' + newClass;
+                requestAnimationFrame(() => bgOverlay.classList.add('visible'));
+            }, 450);
+        } else {
+            bgOverlay.className = 'bg-overlay ' + newClass;
+            requestAnimationFrame(() => bgOverlay.classList.add('visible'));
+        }
+    }
+
+    // --- Team Filter Dropdown Logic ---
+    teamFilterBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = teamDropdown.classList.contains('open');
+        if (isOpen) {
+            teamDropdown.classList.remove('open');
+            teamFilterBtn.setAttribute('aria-expanded', 'false');
+            teamFilterBtn.classList.remove('open');
+        } else {
+            teamDropdown.classList.add('open');
+            teamFilterBtn.setAttribute('aria-expanded', 'true');
+            teamFilterBtn.classList.add('open');
+        }
+    });
+
+    teamDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const item = e.target.closest('.team-dropdown-item');
+        if (!item) return;
+        const team = item.dataset.team;
+        state.selectedTeam = team;
+
+        // Update active states
+        teamDropdownItems.forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+
+        // Update button label
+        teamFilterLabel.textContent = team === 'all' ? 'All Teams' : team;
+
+        // Style the button
+        teamFilterBtn.className = 'team-filter-btn';
+        if (team !== 'all') {
+            teamFilterBtn.classList.add('team-active', `team-active-${team.toLowerCase()}`);
+        }
+
+        // Dissolve background
+        dissolveBackground(team.toLowerCase());
+
+        // Close dropdown
+        teamDropdown.classList.remove('open');
+        teamFilterBtn.setAttribute('aria-expanded', 'false');
+        teamFilterBtn.classList.remove('open');
+
+        updateClearButton();
+        renderInstant();
+    });
+
+    // Close team dropdown when clicking outside
+    document.addEventListener('click', () => {
+        teamDropdown.classList.remove('open');
+        teamFilterBtn.setAttribute('aria-expanded', 'false');
+        teamFilterBtn.classList.remove('open');
+    });
 
     function updateActiveSortLabel() {
         const selectedOption = sortSelect.options[sortSelect.selectedIndex];
@@ -173,8 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     document.addEventListener('click', closeDropdowns);
-    window.addEventListener('resize', closeDropdowns);
-    window.addEventListener('scroll', closeDropdowns, {passive: true});
+    window.addEventListener('resize', closeDropdowns, { passive: true });
+    window.addEventListener('scroll', closeDropdowns, { passive: true });
 
     function openDropdown(e, skill, btnRef) {
         e.stopPropagation();
@@ -283,11 +371,19 @@ document.addEventListener('DOMContentLoaded', () => {
         state.selectedFilters.clear();
         state.searchTerm = '';
         state.sortBy = 'roll-asc';
+        state.selectedTeam = 'all';
         
         // Reset DOM Inputs instantly
         searchInput.value = '';
         sortSelect.value = 'roll-asc';
         document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+
+        // Reset team filter
+        teamFilterLabel.textContent = 'All Teams';
+        teamFilterBtn.className = 'team-filter-btn';
+        teamDropdownItems.forEach(el => el.classList.remove('active'));
+        teamDropdown.querySelector('[data-team="all"]').classList.add('active');
+        dissolveBackground('all');
         
         updateClearButton();
         updateActiveSortLabel();
@@ -295,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateClearButton() {
-        clearFiltersBtn.style.display = state.selectedFilters.size > 0 || state.searchTerm.length > 0 || state.sortBy !== 'roll-asc' ? 'inline-flex' : 'none';
+        clearFiltersBtn.style.display = state.selectedFilters.size > 0 || state.searchTerm.length > 0 || state.sortBy !== 'roll-asc' || state.selectedTeam !== 'all' ? 'inline-flex' : 'none';
     }
 
     let debounceTimer;
@@ -305,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             state.searchTerm = e.target.value.trim().toLowerCase();
             updateClearButton();
             renderInstant();
-        }, 200);
+        }, 150);
     });
 
     sortSelect.addEventListener('change', (e) => {
@@ -341,6 +437,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyFiltersAndSort() {
         currentFiltered = processedData.filter(student => {
+            // Team filter
+            if (state.selectedTeam !== 'all') {
+                if (student.team !== state.selectedTeam) return false;
+            }
+
             if (state.selectedFilters.size > 0) {
                 let hasAny = false;
                 for (let i = 0; i < student.skills.length; i++) {
@@ -386,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const student = currentFiltered[i];
             const card = document.createElement('div');
             card.className = 'card';
-            card.style.animationDelay = `${Math.min((i % CHUNK_SIZE) * 0.05, 0.5)}s`;
+            card.style.animationDelay = `${Math.min((i % CHUNK_SIZE) * 0.03, 0.3)}s`;
 
             const header = document.createElement('div');
             header.className = 'card-header';

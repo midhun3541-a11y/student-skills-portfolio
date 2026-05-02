@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 
 <head>
     <!-- other tags -->
@@ -27,6 +27,7 @@
 </head>
 
 <body>
+    <div id="bgOverlay" class="bg-overlay"></div>
     <header class="sticky-header">
         <div class="header-top">
             <!-- LEFT: Heading -->
@@ -40,6 +41,42 @@
             <div class="header-controls">
                 <div class="search-wrapper">
                     <input type="text" id="searchInput" placeholder="Search by name, skill, or team...">
+                </div>
+                <div class="team-filter-wrapper">
+                    <button id="teamFilterBtn" class="team-filter-btn" aria-haspopup="true" aria-expanded="false">
+                        <svg class="team-filter-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span id="teamFilterLabel">All Teams</span>
+                        <svg class="team-filter-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div id="teamDropdown" class="team-dropdown" role="listbox">
+                        <div class="team-dropdown-item active" data-team="all" role="option">
+                            <span class="team-dropdown-dot dot-all"></span>
+                            All Teams
+                        </div>
+                        <div class="team-dropdown-item" data-team="Stark" role="option">
+                            <img class="team-dropdown-logo" src="Logos/Stark.png" alt="Stark">
+                            Stark
+                        </div>
+                        <div class="team-dropdown-item" data-team="Targaryen" role="option">
+                            <img class="team-dropdown-logo" src="Logos/Targaryen.png" alt="Targaryen">
+                            Targaryen
+                        </div>
+                        <div class="team-dropdown-item" data-team="Lannister" role="option">
+                            <img class="team-dropdown-logo" src="Logos/Lannister.png" alt="Lannister">
+                            Lannister
+                        </div>
+                        <div class="team-dropdown-item" data-team="Baratheon" role="option">
+                            <img class="team-dropdown-logo" src="Logos/Baratheon.png" alt="Baratheon">
+                            Baratheon
+                        </div>
+                    </div>
                 </div>
                 <div class="sort-wrapper">
                     <select id="sortSelect">

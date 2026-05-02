@@ -40,9 +40,9 @@
     --team-lannister-text: #a16207;
     --team-lannister-glow: 0 0 10px rgba(202, 138, 4, 0.25);
     
-    --team-baratheon-bg: linear-gradient(135deg, #fff7ed, #ffedd5);
-    --team-baratheon-text: #c2410c;
-    --team-baratheon-glow: 0 0 10px rgba(234, 88, 12, 0.25);
+    --team-baratheon-bg: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+    --team-baratheon-text: #9333ea;
+    --team-baratheon-glow: 0 0 10px rgba(147, 51, 234, 0.25);
 }
 
 [data-theme="dark"] {
@@ -87,8 +87,8 @@
     --team-lannister-text: #fde047;
     --team-lannister-glow: none;
     
-    --team-baratheon-bg: #3f1e0f;
-    --team-baratheon-text: #fdba74;
+    --team-baratheon-bg: #3b0764;
+    --team-baratheon-text: #d8b4fe;
     --team-baratheon-glow: none;
 }
 
@@ -105,20 +105,20 @@ html {
     max-width: 100%;
 }
 
-/* Single global rule for ultra-smooth theme switching — colors only, no layout */
+/* GPU-friendly theme switching — only color props, NO box-shadow (expensive paint) */
 body, .card, .sticky-header, .filter-pill, #searchInput, #sortSelect,
 .score-badge, .avatar, .theme-toggle, .custom-dropdown-menu, .dropdown-item,
 .team-badge, .note, .expand-icon, .roll-badge, .sort-value,
 .student-name, .card-meta, .skill-name, .score-value, .score-label,
 .no-results, .star-empty, .star-filled, .skeleton-card, .card-content-inner,
-.dropdown-divider, .active-sort-indicator, h1.glow-text {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+.dropdown-divider, .active-sort-indicator, h1.glow-text,
+.team-filter-btn, .team-dropdown, .team-dropdown-item {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-    background-attachment: fixed;
     color: var(--text-primary);
     min-height: 100vh;
     padding-top: 170px;
@@ -195,16 +195,15 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    background: rgba(18, 18, 18, 0.96); /* Solid enough to prevent overlap visibility */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(18, 18, 18, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
     z-index: 100;
     padding: 1rem 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 [data-theme="light"] .sticky-header {
@@ -436,34 +435,235 @@ h1.glow-text {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* ===== Team Filter Dropdown ===== */
+.team-filter-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.team-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.team-filter-btn:hover {
+    border-color: var(--accent-text);
+    box-shadow: 0 4px 10px var(--accent-glow);
+}
+
+.team-filter-btn.open {
+    border-color: var(--accent-text);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.team-filter-btn .team-filter-icon {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.team-filter-btn .team-filter-chevron {
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-filter-btn.open .team-filter-chevron {
+    transform: rotate(180deg);
+}
+
+/* Active team button styles */
+.team-filter-btn.team-active {
+    font-weight: 600;
+}
+
+.team-filter-btn.team-active-stark {
+    background: var(--team-stark-bg);
+    color: var(--team-stark-text);
+    border-color: var(--team-stark-text);
+}
+
+.team-filter-btn.team-active-targaryen {
+    background: var(--team-targaryen-bg);
+    color: var(--team-targaryen-text);
+    border-color: var(--team-targaryen-text);
+}
+
+.team-filter-btn.team-active-lannister {
+    background: var(--team-lannister-bg);
+    color: var(--team-lannister-text);
+    border-color: var(--team-lannister-text);
+}
+
+.team-filter-btn.team-active-baratheon {
+    background: var(--team-baratheon-bg);
+    color: var(--team-baratheon-text);
+    border-color: var(--team-baratheon-text);
+}
+
+/* Team Dropdown Panel */
+.team-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 200px;
+    background: var(--dropdown-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 0.4rem;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.team-dropdown.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.team-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.team-dropdown-item:hover {
+    background: var(--hover-bg);
+}
+
+.team-dropdown-item.active {
+    background: var(--accent-color);
+    color: var(--accent-text);
+    font-weight: 600;
+}
+
+.team-dropdown-item:active {
+    transform: scale(0.98);
+}
+
+/* Team color dots (All Teams only) */
+.team-dropdown-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+.dot-all {
+    background: linear-gradient(135deg, #64748b, #94a3b8);
+}
+
+/* Team logo images in dropdown */
+.team-dropdown-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--card-border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: transform 0.15s ease;
+}
+
+.team-dropdown-item:hover .team-dropdown-logo {
+    transform: scale(1.08);
+}
+
+/* ===== Background Overlay for Dissolve Transitions ===== */
+.bg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+}
+
+.bg-overlay.visible {
+    opacity: 1;
+}
+
+/* Pastel Team Gradients — Light Theme */
+.bg-overlay.bg-light-stark {
+    background: linear-gradient(135deg, #eef2f7 0%, #d5dde8 35%, #c8d5e3 60%, #e8edf4 100%);
+}
+.bg-overlay.bg-light-targaryen {
+    background: linear-gradient(135deg, #fdf2f4 0%, #f9d5db 35%, #f5c4cd 60%, #fce8ec 100%);
+}
+.bg-overlay.bg-light-lannister {
+    background: linear-gradient(135deg, #fefbf0 0%, #f7e8c4 35%, #f2ddb0 60%, #fcf5e0 100%);
+}
+.bg-overlay.bg-light-baratheon {
+    background: linear-gradient(135deg, #f5f0ff 0%, #ddd0f7 35%, #d0bef5 60%, #ece4fc 100%);
+}
+
+/* Pastel Team Gradients — Dark Theme */
+.bg-overlay.bg-dark-stark {
+    background: linear-gradient(135deg, #0d1117 0%, #161d2a 30%, #1c2535 55%, #0f1520 100%);
+}
+.bg-overlay.bg-dark-targaryen {
+    background: linear-gradient(135deg, #140a0c 0%, #2a1218 30%, #351620 55%, #180c10 100%);
+}
+.bg-overlay.bg-dark-lannister {
+    background: linear-gradient(135deg, #14120a 0%, #2a2210 30%, #352b14 55%, #18150c 100%);
+}
+.bg-overlay.bg-dark-baratheon {
+    background: linear-gradient(135deg, #120a1e 0%, #2d1250 30%, #3b1868 55%, #1a0e2d 100%);
+}
+
 /* Custom Dropdown */
 .custom-dropdown-menu {
     position: absolute;
     background: var(--dropdown-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     min-width: 200px;
     z-index: 1000;
     padding: 0.4rem;
     display: flex;
     flex-direction: column;
     opacity: 0;
-    transform: translateY(-5px) scale(0.98);
+    transform: translateY(-4px);
     pointer-events: none;
-    will-change: transform, opacity;
 }
 
-/* Transition handles both the fade-in and the color theme changes smoothly */
 .custom-dropdown-menu {
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
+    transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 .custom-dropdown-menu.show {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     pointer-events: auto;
 }
 
@@ -512,7 +712,6 @@ h1.glow-text {
     animation: loading 1.5s ease infinite;
     border-radius: 20px;
     border: 1px solid var(--card-border);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 @keyframes loading {
@@ -530,15 +729,16 @@ h1.glow-text {
     flex-direction: column;
     box-shadow: var(--card-shadow);
     opacity: 0;
-    animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: fadeSlideUp 0.3s ease forwards;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
     z-index: 1;
-    /* Desktop hover transition — overridden on mobile */
-    transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    contain: layout style paint;
+    /* GPU-only hover: transform + opacity only */
+    transition: transform 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 @keyframes fadeSlideUp {
@@ -546,8 +746,7 @@ h1.glow-text {
 }
 
 .card:hover {
-    box-shadow: var(--card-shadow-hover);
-    transform: translateY(-4px);
+    transform: translateY(-3px);
 }
 
 .card-header {
@@ -578,7 +777,7 @@ h1.glow-text {
     flex-shrink: 0;
 }
 
-.card:hover .avatar { transform: scale(1.05); }
+.card:hover .avatar { transform: scale(1.03); }
 
 .card-info { flex: 1; min-width: 0; overflow: hidden; }
 
@@ -591,7 +790,6 @@ h1.glow-text {
     text-overflow: ellipsis;
     color: var(--text-primary);
     margin-bottom: 0.2rem;
-    transition: color 0.3s ease;
 }
 
 .card-meta {
@@ -635,10 +833,10 @@ h1.glow-text {
     min-width: 44px;
 }
 
-.card:hover .score-badge { transform: scale(1.08); border-color: var(--accent-text); }
+.card:hover .score-badge { transform: scale(1.05); }
 
-.score-value { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--accent-text); line-height: 1; transition: color 0.3s ease; }
-.score-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 600; color: var(--text-secondary); margin-top: 0.2rem; transition: color 0.3s ease; }
+.score-value { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--accent-text); line-height: 1; }
+.score-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 600; color: var(--text-secondary); margin-top: 0.2rem; }
 
 .expand-icon {
     color: var(--text-secondary);
@@ -659,18 +857,17 @@ h1.glow-text {
     color: var(--accent-text);
 }
 
-/* Expanded Content — height driven by JS scrollHeight for pixel-perfect smoothness */
+/* Expanded Content — height driven by JS scrollHeight */
 .card-content {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-    will-change: max-height, opacity;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
 }
 
 /* Expand icon rotation */
 .expand-icon {
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, color 0.3s ease;
+    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
 }
 
 .card-content-inner {
@@ -681,7 +878,7 @@ h1.glow-text {
 
 .skills-list { display: flex; flex-direction: column; gap: 0.8rem; }
 .skill-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-.skill-name { color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; transition: color 0.3s ease; }
+.skill-name { color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 
 /* Stars Animation */
 .stars-container { display: flex; gap: 2px; align-items: center; }
@@ -700,12 +897,12 @@ h1.glow-text {
     height: 100%;
 }
 
-.star-empty { color: var(--star-empty); transition: color 0.3s ease; }
+.star-empty { color: var(--star-empty); }
 
 .star-filled {
     color: var(--star-filled);
-    clip-path: inset(0 100% 0 0); /* Start completely hidden */
-    transition: clip-path 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.4s ease;
 }
 
 /* When expanded, reveal the filled stars with stagger */
@@ -725,7 +922,7 @@ h1.glow-text {
     line-height: 1.5;
 }
 
-.no-results { grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-secondary); font-size: 1.1rem; transition: color 0.3s ease; }
+.no-results { grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-secondary); font-size: 1.1rem; }
 .highlight { background-color: var(--highlight-bg); color: #000; border-radius: 4px; padding: 0 2px; }
 
 /* ===== Responsive Breakpoints ===== */
@@ -806,6 +1003,24 @@ h1.glow-text {
         margin-top: 0.1rem;
     }
 
+    /* Team filter full width on mobile */
+    .team-filter-wrapper {
+        width: 100%;
+    }
+
+    .team-filter-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+    }
+
+    .team-dropdown {
+        width: 100%;
+        border-radius: 12px;
+    }
+
     /* Filter section */
     .filters-section { gap: 0.4rem; }
 
@@ -846,8 +1061,9 @@ h1.glow-text {
         padding: 1rem;
         border-radius: 16px;
         transform: none !important;
-        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.25s ease, border-color 0.25s ease;
         will-change: auto;
+        contain: layout style paint;
     }
     .card:hover,
     .card:active,
